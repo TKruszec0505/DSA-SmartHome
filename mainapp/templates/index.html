@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Sterowanie urządzeniami</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        /* zielony – ON */
+        .on {
+            background-color: #28a745;
+            color: white;
+        }
+
+        /* czerwony – OFF */
+        .off {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sterowanie urządzeniami</h1>
+
+    <!-- Przełączniki -->
+    <button id="ledButton" onclick="toggleLed()">Ledy</button>
+    <button id="lampButton" onclick="toggleLamp()">Lampa</button>
+
+    <p id="response"></p>
+
+    <script>
+        // Stany urządzeń
+
+        let ledState = false;
+        let lampState = false;
+
+        // Przełączanie LED
+        function toggleLed() {
+            const endpoint = ledState ? "/wylacz_led" : "/wlacz_led";
+            fetch(endpoint)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("response").innerText = data;
+                    receiveCommand(); // po kliknięciu od razu zsynchronizuj stan
+                })
+                .catch(error => console.error("Błąd:", error));
+        }
+
+        // Przełączanie Lampy
+        function toggleLamp() {
+            const endpoint = lampState ? "/wylacz_lampa" : "/wlacz_lampa";
+            fetch(endpoint)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("response").innerText = data;
+                    receiveCommand(); // po kliknięciu od razu zsynchronizuj stan
+                })
+                .catch(error => console.error("Błąd:", error));
+        }
+
+        // Synchronizacja przycisków ze stanem z backendu
+        function receiveCommand() {
+            fetch("/state")
+                .then(response => response.json())
+                .then(data => {
+                    // aktualizacja stanów
+                    ledState = data.ledy === "włączone";
+                    lampState = data.lampa === "włączona";
+
+                    updateLedButton();
+                    updateLampButton();
+                })
+                .catch(error => console.error("Błąd:", error));
+        }
+
+        // Aktualizacja wyglądu przycisków
+        function updateLedButton() {
+            const btn = document.getElementById("ledButton");
+            if (ledState) {
+                btn.classList.add("on");
+                btn.classList.remove("off");
+                btn.innerText = "Ledy (włączone)";
+            } else {
+                btn.classList.add("off");
+                btn.classList.remove("on");
+                btn.innerText = "Ledy (wyłączone)";
+            }
+        }
+
+        function updateLampButton() {
+            const btn = document.getElementById("lampButton");
+            if (lampState) {
+                btn.classList.add("on");
+                btn.classList.remove("off");
+                btn.innerText = "Lampa (włączona)";
+            } else {
+                btn.classList.add("off");
+                btn.classList.remove("on");
+                btn.innerText = "Lampa (wyłączona)";
+            }
+        }
+
+        // Pierwsze pobranie stanu po załadowaniu strony
+        receiveCommand();
+
+        // Odświeżanie co 2 sekundy
+        setInterval(receiveCommand, 200);
+    </script>
+</body>
+</html>
