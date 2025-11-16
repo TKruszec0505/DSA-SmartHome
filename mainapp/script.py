@@ -41,7 +41,6 @@ def play_sound(filename):
         stream.stop_stream()
         stream.close()
         pa.terminate()
-
     finally:
         audio_lock.clear()
 #-------------------------- funkcje upraszczajace ----------------------------------------------------------------------
@@ -49,7 +48,77 @@ def enginesay(say):
     engine = pyttsx3.init()
     engine.say(say)
     engine.runAndWait()
+def lambda_for_commands(flag_name: str,state: bool, tekst_on: str, tekst_already_on: str) -> None:
+    try:
+        flag_value = getattr(config, flag_name)
+        if not config.return_command_mode:
+            setattr(config, flag_name, state)
+        else:
+            if not flag_value:
+                setattr(config, flag_name, state)
+                enginesay(tekst_on)
+            else:
+                enginesay(tekst_already_on)
+    except AttributeError:
+        print(f"Nie znaleziono flagi '{flag_name}' w config")
+    except sr.UnknownValueError:
+        print("nie rozumiem")
+
 #--------------------------nasłuchiwanie i reagowanie na komendy-------------------------------------------------------
+command_list = {
+    "lampa_on":{
+        "command": ["oświeć lampę","zaświeć lampę","włącz lampę"],
+        "func": lambda: lambda_for_commands("lampa_mode",True,"oświetlam lampę","lampa już jest oświetlona"),
+    },
+    "lampa_off":{
+        "command": ["zgaś lampę", "wyłącz lampę", "gaś lampę"],
+        "func": lambda: lambda_for_commands("lampa_mode",False,"gaszę lampę","lampa jest już zgaszona")
+    },
+    "gniazdo_on":{
+        "command": ["włącz gniazdo 1","włącz gniazdko 1 ","włącz gniazdo pierwsze","włącz gniazdko pierwsze","włącz gniazdko numer jeden"],
+        "func": lambda: lambda_for_commands("ledy_mode",True,"włączam gniazdko numer jeden",
+                                            "gniazdko numer jeden jest juz włączone")
+    },
+    "gniazdo_off":{
+        "command": ["wyłącz gniazdo 1", "wyłącz gniazdko 1", "wyłącz gniazdo pierwsze", "wyłącz gniazdko pierwsze",
+                    "wyłącz gniazdko numer jeden"],
+        "func": lambda: lambda_for_commands("ledy_mode", False, "wyłączam gniazdko numer jeden",
+                                            "gniazdko numer jeden jest juz wyłączone")
+    },
+    "gniazdo2_on":{
+        "command": ["włącz gniazdo dwa","włącz gniazdko dwa","włącz gniazdo drugie","włącz gniazdko drugie","włącz gniazdko numer dwa","włącz gniazdko 2"],
+        "func": lambda: lambda_for_commands("gniazdo2_mode", True, "włączam gniazdko numer dwa",
+                                            "gniazdko numer dwa jest juz włączone")
+
+    },
+    "gniazdo2_off":{
+        "command": ["wyłącz gniazdo dwa", "wyłącz gniazdko dwa", "wyłącz gniazdo drugie", "wyłącz gniazdko drugie",
+                    "wyłącz gniazdko numer dwa"],
+        "func": lambda: lambda_for_commands("gniazdo2_mode", False, "wyłączam gniazdko numer dwa",
+                                            "gniazdko numer dwa jest juz wyłączone")
+    },
+    "odsłoń":{
+        "command": ["odsłoń"," odsłoń rolete"," odsłoń okno"],
+        "func": lambda: lambda_for_commands("motor_up_state", True, "odsłaniam",
+                                            "okno już jest odsłaniane"),
+        "func2": lambda: lambda_for_commands("motor_down_state", False, None,
+                                            None)
+    },
+    "stop":{
+        "command": ["stop"],
+        "func": lambda: lambda_for_commands("motor_up_state", False, "wyłączam silnik",
+                                            "silnik jest już wyłączony"),
+        "func2": lambda: lambda_for_commands("motor_down_state", False, None,
+                                            None)
+    },
+    "zasłoń":{
+        "command": ["zasłoń","zasłoń rolete", "zasłoń okno"],
+        "func": lambda: lambda_for_commands("motor_up_state", False, "zasłaniam",
+                                            "okno już jest zasłaniane"),
+        "func2": lambda: lambda_for_commands("motor_down_state", True, None,
+                                             None)
+    }
+}
 def listen_for_command():
     global asisten_key
     global asisten_key_wrtie
@@ -63,6 +132,11 @@ def listen_for_command():
         try:
             text = recognizer.recognize_google(audio, language="pl-PL")
             print("Rozpoznano:", text)
+            for item in command_list.values():
+                if any(cmd in text.lower() for cmd in item["command"]):
+                    item["func"]()
+                    break
+
             if text.lower() == "dziękuję" or text.lower() == "dzięki":
                 try:
                     if config.return_command_mode:
@@ -89,108 +163,6 @@ def listen_for_command():
                 try:
                     threading.Thread(target=play_sound, args=("asystentscore.wav",)).start()
                     asisten_key_open = True
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-#-----------------------funkcje embeded---------------------------------------------------------------------------------
-            if "oświeć lampę" in text.lower() or "zaświeć lampę" in text.lower() or "włącz lampę" in text.lower():
-                print("Oświetlam lampę")
-                try:
-                    if not config.return_command_mode:
-                        config.lampa_mode = True
-                    elif config.return_command_mode:
-
-                        if not config.lampa_mode:
-                            config.lampa_mode = True
-                            enginesay("oświetlam lampę")
-
-                        elif config.lampa_mode:
-                            enginesay("lampa już jest oświetlona")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-            if "zgaś lampę" in text.lower() or "wyłącz lampę" in text.lower() or "gaś lampę" in text.lower():
-                print("Gasze lampę")
-                try:
-                    if not config.return_command_mode:
-                        config.lampa_mode = False
-                    if config.return_command_mode:
-                        if config.lampa_mode:
-                            config.lampa_mode = False
-                            enginesay("gasze lampę")
-
-                        elif not config.lampa_mode:
-                            enginesay("lampa już jest zgaszona")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-            if "włącz gniazodo" in text.lower() or "włącz gniazdko" in text.lower() or "włącz gniazdko numer jeden" in text.lower():
-                try:
-                    if not config.return_command_mode:
-                        config.ledy_mode = True
-                    elif config.return_command_mode:
-                        if not config.ledy_mode:
-                            config.ledy_mode = True
-                            enginesay("oświetlam led-y")
-
-                        elif config.ledy_mode:
-                            enginesay("led-y już są oświetlone")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-            if "wyłącz gniazodo"  in text.lower() or "wyłacz gniazdko" in text.lower():
-                try:
-                    if not config.return_command_mode:
-                        config.ledy_mode = False
-                    if config.return_command_mode:
-                        if config.ledy_mode:
-                            config.ledy_mode = False
-                            enginesay("gasze led-y")
-
-                        elif not config.ledy_mode:
-                            enginesay("led-y już są zgaszone")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-
-            if "zasłoń" in text.lower():
-                try:
-                    if not config.return_command_mode:
-                        config.motor_down_state = True
-                    if config.return_command_mode:
-                        if not config.motor_down_state:
-                            config.motor_down_state = True
-                            enginesay("zasłaniam")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-            if "odsłoń" in text.lower():
-                try:
-                    if not config.return_command_mode:
-                        config.motor_up_state = True
-                    if config.return_command_mode:
-                        if not config.motor_up_state:
-                            config.motor_up_state = True
-                            enginesay("odsłaniam")
-                    else:
-                        pass
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
-            if "stop" in text.lower():
-                try:
-                    if not config.return_command_mode:
-                        config.motor_down_state = False
-                        config.motor_up_state = False
-                    if config.return_command_mode:
-                        config.motor_up_state = False
-                        config.motor_down_state = False
-                        enginesay("wyłączam silnik")
-                    else:
-                        pass
                 except sr.UnknownValueError:
                     print("nie rozumiem")
 #------------------------funkcje klawiszowe-----------------------------------------------------------------------------
@@ -309,9 +281,7 @@ def listen_for_number():
             print("Błąd usługi rozpoznawania mowy:", e)
         except sr.UnknownValueError:
             print("nie rozumiem co powiedziałeś")
-
 #-----------------------------------------petla wyzwalająca-------------------------------------------------------------
-
 runing = False
 def run_prog():
     global runing

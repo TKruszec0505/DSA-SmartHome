@@ -49,7 +49,30 @@ def enginesay(say):
     engine = pyttsx3.init()
     engine.say(say)
     engine.runAndWait()
+
+
+def lambda_for_commands(flag_name: str, tekst_on: str, tekst_already_on: str) -> None:
+    try:
+        flag_value = getattr(config, flag_name)  # odczytujemy aktualną wartość flagi
+        if not config.return_command_mode:
+            setattr(config, flag_name, True)
+        else:
+            if not flag_value:
+                setattr(config, flag_name, True)
+                enginesay(tekst_on)
+            else:
+                enginesay(tekst_already_on)
+    except AttributeError:
+        print(f"Nie znaleziono flagi '{flag_name}' w config")
+    except sr.UnknownValueError:
+        print("nie rozumiem")
+
 #--------------------------nasłuchiwanie i reagowanie na komendy-------------------------------------------------------
+command_list = {
+    "oświeć lampę" or "zaświeć lampę" or "włącz lampę": {lambda_for_commands}
+
+
+}
 def listen_for_command():
     global asisten_key
     global asisten_key_wrtie
