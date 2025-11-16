@@ -59,13 +59,9 @@ def listen_for_command():
         time.sleep(1)
     with sr.Microphone() as source:
         print("Nasłuchiwanie hasła wybudzającego...")
-        #if devboard:
-         #   devboard.write(("Nasłuchiwanie" +'\n').encode('utf-8'))
         audio = recognizer.listen(source)
         try:
             text = recognizer.recognize_google(audio, language="pl-PL")
-            #if devboard:
-             #   devboard.write(("Roz:"+ text + '\n').encode('utf-8'))
             print("Rozpoznano:", text)
             if text.lower() == "dziękuję" or text.lower() == "dzięki":
                 try:
@@ -96,7 +92,6 @@ def listen_for_command():
                 except sr.UnknownValueError:
                     print("nie rozumiem")
 #-----------------------funkcje embeded---------------------------------------------------------------------------------
-            #if text.lower() == "oświeć lampę" or text.lower() == "zaświeć lampę":
             if "oświeć lampę" in text.lower() or "zaświeć lampę" in text.lower() or "włącz lampę" in text.lower():
                 print("Oświetlam lampę")
                 try:
@@ -130,7 +125,7 @@ def listen_for_command():
                         pass
                 except sr.UnknownValueError:
                     print("nie rozumiem")
-            if "oświeć led-y" in text.lower() or "włącz led-y" in text.lower() or "zaświeć led-y" in text.lower():
+            if "włącz gniazodo" in text.lower() or "włącz gniazdko" in text.lower() or "włącz gniazdko numer jeden" in text.lower():
                 try:
                     if not config.return_command_mode:
                         config.ledy_mode = True
@@ -145,7 +140,7 @@ def listen_for_command():
                         pass
                 except sr.UnknownValueError:
                     print("nie rozumiem")
-            if "zgaś led-y"  in text.lower() or "wyłacz led-y" in text.lower():
+            if "wyłącz gniazodo"  in text.lower() or "wyłacz gniazdko" in text.lower():
                 try:
                     if not config.return_command_mode:
                         config.ledy_mode = False
@@ -160,6 +155,7 @@ def listen_for_command():
                         pass
                 except sr.UnknownValueError:
                     print("nie rozumiem")
+
             if "zasłoń" in text.lower():
                 try:
                     if not config.return_command_mode:
@@ -168,7 +164,6 @@ def listen_for_command():
                         if not config.motor_down_state:
                             config.motor_down_state = True
                             enginesay("zasłaniam")
-
                     else:
                         pass
                 except sr.UnknownValueError:
@@ -181,7 +176,6 @@ def listen_for_command():
                         if not config.motor_up_state:
                             config.motor_up_state = True
                             enginesay("odsłaniam")
-
                     else:
                         pass
                 except sr.UnknownValueError:
@@ -279,7 +273,6 @@ def listen_and_write():
             pyperclip.copy(text)
             time.sleep(0.5)
             pyautogui.typewrite(text)
-            #threading.Thread(target=play_sound, args=("asystentscore2.wav",)).start()
             asisten_key_wrtie = False
         except sr.UnknownValueError:
             print("Nie rozumiem co powiedziałeś")

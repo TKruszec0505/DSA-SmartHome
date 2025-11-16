@@ -59,19 +59,15 @@ def listen_for_command():
         time.sleep(1)
     with sr.Microphone() as source:
         print("Nasłuchiwanie hasła wybudzającego...")
-        #if devboard:
-         #   devboard.write(("Nasłuchiwanie" +'\n').encode('utf-8'))
         audio = recognizer.listen(source)
         try:
             text = recognizer.recognize_google(audio, language="pl-PL")
-            #if devboard:
-             #   devboard.write(("Roz:"+ text + '\n').encode('utf-8'))
             print("Rozpoznano:", text)
             if text.lower() == "dziękuję" or text.lower() == "dzięki":
                 try:
                     if config.return_command_mode:
                         enginesay("nie ma za co")
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "szukaj":
                 print("Wyszukiwanie aktywowane!")
@@ -79,24 +75,23 @@ def listen_for_command():
                     # odtwarzanie dzwieku
                     threading.Thread(target=play_sound, args=("asystentscore.wav",)).start()
                     asisten_key = True
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "dyktuję":
                 print("dyktowanie głosowe aktywowane!")
                 try:
                     threading.Thread(target=play_sound, args=("asystentscore.wav",)).start()
                     asisten_key_wrtie = True
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "otwórz":
                 print("Otwieranie aktywowane!")
                 try:
                     threading.Thread(target=play_sound, args=("asystentscore.wav",)).start()
                     asisten_key_open = True
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
 #-----------------------funkcje embeded---------------------------------------------------------------------------------
-            #if text.lower() == "oświeć lampę" or text.lower() == "zaświeć lampę":
             if "oświeć lampę" in text.lower() or "zaświeć lampę" in text.lower() or "włącz lampę" in text.lower():
                 print("Oświetlam lampę")
                 try:
@@ -112,7 +107,7 @@ def listen_for_command():
                             enginesay("lampa już jest oświetlona")
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if "zgaś lampę" in text.lower() or "wyłącz lampę" in text.lower() or "gaś lampę" in text.lower():
                 print("Gasze lampę")
@@ -128,9 +123,8 @@ def listen_for_command():
                             enginesay("lampa już jest zgaszona")
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
-            #if text.lower() == "oświeć led-y" or text.lower() == "zaświeć led-y":
             if "oświeć led-y" in text.lower() or "włącz led-y" in text.lower() or "zaświeć led-y" in text.lower():
                 try:
                     if not config.return_command_mode:
@@ -144,7 +138,7 @@ def listen_for_command():
                             enginesay("led-y już są oświetlone")
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if "zgaś led-y"  in text.lower() or "wyłacz led-y" in text.lower():
                 try:
@@ -159,7 +153,7 @@ def listen_for_command():
                             enginesay("led-y już są zgaszone")
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if "zasłoń" in text.lower():
                 try:
@@ -169,10 +163,9 @@ def listen_for_command():
                         if not config.motor_down_state:
                             config.motor_down_state = True
                             enginesay("zasłaniam")
-
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if "odsłoń" in text.lower():
                 try:
@@ -182,10 +175,9 @@ def listen_for_command():
                         if not config.motor_up_state:
                             config.motor_up_state = True
                             enginesay("odsłaniam")
-
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if "stop" in text.lower():
                 try:
@@ -198,7 +190,7 @@ def listen_for_command():
                         enginesay("wyłączam silnik")
                     else:
                         pass
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
 #------------------------funkcje klawiszowe-----------------------------------------------------------------------------
             if text.lower() == "enter":
@@ -206,27 +198,26 @@ def listen_for_command():
                 try:
                     threading.Thread(target=play_sound, args=("asystentscore2.wav",)).start()
                     pyautogui.press('enter')
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "skasuj":
                 print("kasuje")
                 try:
                     threading.Thread(target=play_sound, args=("asystentscore2.wav",)).start()
                     pyautogui.hotkey('ctrl', 'backspace')
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "screen":
                 print("screenuje")
                 try:
                     pyautogui.hotkey('windows', 'shift', 's')
-
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "klik":
                 print("klik")
                 try:
                     pyautogui.click(clicks=2)
-                except:
+                except sr.UnknownValueError:
                     print("nie rozumiem")
             if text.lower() == "weź":
                 pyautogui.mouseDown()
@@ -234,12 +225,8 @@ def listen_for_command():
                 pyautogui.mouseUp()
         except sr.UnknownValueError:
             print("Nie rozumiem.")
-            #if devboard:
-             #   devboard.write(("nie rozumiem\n").encode('utf-8'))
         except sr.RequestError as e:
             print("Błąd usługi rozpoznawania mowy:", e)
-           # if devboard:
-             #   devboard.write(("Błąd usługi rozpoznawania\n").encode('utf-8'))
 #-----------------------------------------wyłapywanie instrukcji po rozpoznaniu komendy---------------------------------
 def listen_and_search():
     global asisten_key
@@ -284,7 +271,6 @@ def listen_and_write():
             pyperclip.copy(text)
             time.sleep(0.5)
             pyautogui.typewrite(text)
-            #threading.Thread(target=play_sound, args=("asystentscore2.wav",)).start()
             asisten_key_wrtie = False
         except sr.UnknownValueError:
             print("Nie rozumiem co powiedziałeś")
