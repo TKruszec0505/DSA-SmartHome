@@ -5,23 +5,16 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(.)
 include_directories(clientapp)
-include_directories(firmware)
 include_directories(mainapp)
 
 add_executable(DSA_SmartHome
-        clientapp/__init__.py
-        clientapp/asystentscore.wav
-        clientapp/asystentscore2.wav
-        clientapp/config.py
-        clientapp/getGraphs.py
-        clientapp/getLocalHost.py
-        clientapp/getPosision.py
-        clientapp/indexscript.py
-        clientapp/interface.py
-        clientapp/qrcode1.png
-        clientapp/script.py
-        clientapp/ssRecognisionNN.py
-        "firmware/module0 transmiter.cpp"
-        firmware/Module1.cpp
-        firmware/module2.cpp
-        mainapp/testsC.cpp)
+        mainapp/testsC.cpp
+        mainapp/main.cpp
+)
+
+# Jeśli używasz WiringPi na Pi
+target_link_libraries(DSA_SmartHome wiringPi)
+
+# Kopiowanie zasobów Python/WAV/PNG do katalogu build
+file(COPY clientapp DESTINATION ${CMAKE_BINARY_DIR}/resources)
+
