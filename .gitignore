@@ -3,4 +3,4 @@
 *.iml
 __pycache__/
 .idea/
-wiringPi
+WiringPi
