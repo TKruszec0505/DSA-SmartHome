@@ -19,7 +19,6 @@ asisten_key_wrtie = False
 asisten_key_open = False
 neural_key = False
 
-#---------------------------odgywanie dzwięków bez konfliktów niskopoziomowych(sterowniki karty dziwekowej)-------------
 def play_sound(filename):
     audio_lock.set()
     try:
@@ -43,24 +42,23 @@ def play_sound(filename):
         pa.terminate()
     finally:
         audio_lock.clear()
-#-------------------------- funkcje upraszczajace ----------------------------------------------------------------------
 def enginesay(say):
     engine = pyttsx3.init()
     engine.say(say)
     engine.runAndWait()
-def lambda_for_commands(flag_name: str,state: bool, tekst_on: str, tekst_already_on: str) -> None:
+def lambda_for_commands(module,flag_name: str,state: bool, tekst_on: str, tekst_already_on: str) -> None:
     try:
-        flag_value = getattr(config, flag_name)
+        flag_value = getattr(module, flag_name)
         if not config.return_command_mode:
-            setattr(config, flag_name, state)
+            setattr(module, flag_name, state)
         else:
             if not flag_value:
-                setattr(config, flag_name, state)
+                setattr(module, flag_name, state)
                 enginesay(tekst_on)
             else:
                 enginesay(tekst_already_on)
     except AttributeError:
-        print(f"Nie znaleziono flagi '{flag_name}' w config")
+        print(f"Nie znaleziono flagi '{flag_name}' w {module}")
     except sr.UnknownValueError:
         print("nie rozumiem")
 
@@ -68,54 +66,54 @@ def lambda_for_commands(flag_name: str,state: bool, tekst_on: str, tekst_already
 command_list = {
     "lampa_on":{
         "command": ["oświeć lampę","zaświeć lampę","włącz lampę"],
-        "func": lambda: lambda_for_commands("lampa_mode",True,"oświetlam lampę","lampa już jest oświetlona"),
+        "func": lambda: lambda_for_commands(config,"lampa_mode",True,"oświetlam lampę","lampa już jest oświetlona"),
     },
     "lampa_off":{
         "command": ["zgaś lampę", "wyłącz lampę", "gaś lampę"],
-        "func": lambda: lambda_for_commands("lampa_mode",False,"gaszę lampę","lampa jest już zgaszona")
+        "func": lambda: lambda_for_commands(config,"lampa_mode",False,"gaszę lampę","lampa jest już zgaszona")
     },
     "gniazdo_on":{
         "command": ["włącz gniazdo 1","włącz gniazdko 1 ","włącz gniazdo pierwsze","włącz gniazdko pierwsze","włącz gniazdko numer jeden"],
-        "func": lambda: lambda_for_commands("ledy_mode",True,"włączam gniazdko numer jeden",
+        "func": lambda: lambda_for_commands(config,"ledy_mode",True,"włączam gniazdko numer jeden",
                                             "gniazdko numer jeden jest juz włączone")
     },
     "gniazdo_off":{
         "command": ["wyłącz gniazdo 1", "wyłącz gniazdko 1", "wyłącz gniazdo pierwsze", "wyłącz gniazdko pierwsze",
                     "wyłącz gniazdko numer jeden"],
-        "func": lambda: lambda_for_commands("ledy_mode", False, "wyłączam gniazdko numer jeden",
+        "func": lambda: lambda_for_commands(config,"ledy_mode", False, "wyłączam gniazdko numer jeden",
                                             "gniazdko numer jeden jest juz wyłączone")
     },
     "gniazdo2_on":{
         "command": ["włącz gniazdo dwa","włącz gniazdko dwa","włącz gniazdo drugie","włącz gniazdko drugie","włącz gniazdko numer dwa","włącz gniazdko 2"],
-        "func": lambda: lambda_for_commands("gniazdo2_mode", True, "włączam gniazdko numer dwa",
+        "func": lambda: lambda_for_commands(config,"gniazdo2_mode", True, "włączam gniazdko numer dwa",
                                             "gniazdko numer dwa jest juz włączone")
 
     },
     "gniazdo2_off":{
         "command": ["wyłącz gniazdo dwa", "wyłącz gniazdko dwa", "wyłącz gniazdo drugie", "wyłącz gniazdko drugie",
                     "wyłącz gniazdko numer dwa"],
-        "func": lambda: lambda_for_commands("gniazdo2_mode", False, "wyłączam gniazdko numer dwa",
+        "func": lambda: lambda_for_commands(config,"gniazdo2_mode", False, "wyłączam gniazdko numer dwa",
                                             "gniazdko numer dwa jest juz wyłączone")
     },
     "odsłoń":{
         "command": ["odsłoń"," odsłoń rolete"," odsłoń okno"],
-        "func": lambda: lambda_for_commands("motor_up_state", True, "odsłaniam",
+        "func": lambda: lambda_for_commands(config,"motor_up_state", True, "odsłaniam",
                                             "okno już jest odsłaniane"),
-        "func2": lambda: lambda_for_commands("motor_down_state", False, None,
+        "func2": lambda: lambda_for_commands(config,"motor_down_state", False, None,
                                             None)
     },
     "stop":{
         "command": ["stop"],
-        "func": lambda: lambda_for_commands("motor_up_state", False, "wyłączam silnik",
+        "func": lambda: lambda_for_commands(config,"motor_up_state", False, "wyłączam silnik",
                                             "silnik jest już wyłączony"),
-        "func2": lambda: lambda_for_commands("motor_down_state", False, None,
+        "func2": lambda: lambda_for_commands(config,"motor_down_state", False, None,
                                             None)
     },
     "zasłoń":{
         "command": ["zasłoń","zasłoń rolete", "zasłoń okno"],
-        "func": lambda: lambda_for_commands("motor_up_state", False, "zasłaniam",
+        "func": lambda: lambda_for_commands(config,"motor_up_state", False, "zasłaniam",
                                             "okno już jest zasłaniane"),
-        "func2": lambda: lambda_for_commands("motor_down_state", True, None,
+        "func2": lambda: lambda_for_commands(config,"motor_down_state", True, None,
                                              None)
     }
 }
@@ -136,13 +134,6 @@ def listen_for_command():
                 if any(cmd in text.lower() for cmd in item["command"]):
                     item["func"]()
                     break
-
-            if text.lower() == "dziękuję" or text.lower() == "dzięki":
-                try:
-                    if config.return_command_mode:
-                        enginesay("nie ma za co")
-                except sr.UnknownValueError:
-                    print("nie rozumiem")
             if text.lower() == "szukaj":
                 print("Wyszukiwanie aktywowane!")
                 try:

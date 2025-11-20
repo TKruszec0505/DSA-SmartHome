@@ -286,7 +286,6 @@ def debug():
     while True:
         print(config.serial_is_connected)
 
-
 threading.Thread(target=getSerial.lamp_mode_sync_loop, daemon=True).start()
 threading.Thread(target=run_host,daemon=True).start()
 threading.Thread(target=getSerial.led_mode_sync_loop, daemon=True).start()
