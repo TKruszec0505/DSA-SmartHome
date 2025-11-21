@@ -2,6 +2,7 @@
 /.venv/
 *.iml
 __pycache__/
+.__pycache__/
 .idea/
 WiringPi
 .cache/
