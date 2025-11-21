@@ -1,10 +1,13 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-from matplotlib.animation import FuncAnimation  # <- tu jest poprawka
+from matplotlib.animation import FuncAnimation
 import config
 
 def network_status():
-    network_topology = [
+    # lista wszystkich węzłów
+    nodes = ["comp1", "comp2", "website", "server", "motherboard", "mod1", "mod2"]
+    # lista wszystkich możliwych połączeń
+    all_edges = [
         ("comp1","server"),
         ("comp2","server"),
         ("website","server"),
@@ -14,48 +17,46 @@ def network_status():
     ]
 
     g = nx.Graph()
-    g.add_edges_from(network_topology)
+    g.add_nodes_from(nodes)
     pos = nx.spring_layout(g, seed=42)
 
     fig, ax = plt.subplots()
 
     def update(frame):
         ax.clear()
-        topology = network_topology.copy()
-        if not config.server_is_connected:
-            topology = [e for e in topology if e != ("server","motherboard")]
-        if not config.website_is_connected:
-            topology = [e for e in topology if e != ("website","server")]
-        if not config.comp1_is_connected:
-            topology = [e for e in topology if e != ("comp1","server")]
-        if not config.mod1_is_connected:
-            topology = [e for e in topology if e != ("motherboard","mod1")]
-        if not config.mod2_is_connected:
-            topology = [e for e in topology if e != ("motherboard","mod2")]
+
+        nodes = ["comp1", "comp2", "website", "server", "motherboard", "mod1", "mod2"]
+        edges = [
+            ("comp1", "server"),
+            ("comp2", "server"),
+            ("website", "server"),
+            ("server", "motherboard"),
+            ("motherboard", "mod1"),
+            ("motherboard", "mod2"),
+        ]
 
         g.clear()
-        g.add_edges_from(topology)
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)  # dodajemy WSZYSTKIE krawędzie
 
+        # kolory węzłów
         node_colors = []
-        for node in g.nodes():
-            if node == "server" and not config.server_is_connected:
-                node_colors.append("red")
-            elif node == "website" and not config.website_is_connected:
-                node_colors.append("red")
-            elif node == "comp1" and not config.comp1_is_connected:
-                node_colors.append("red")
-            elif node == "mod1" and not config.mod1_is_connected:
-                node_colors.append("red")
-            elif node == "mod2" and not config.mod2_is_connected:
+        for node in nodes:
+            if (node == "server" and not config.server_is_connected) or \
+                    (node == "website" and not config.website_is_connected) or \
+                    (node == "comp1" and not config.comp1_is_connected) or \
+                    (node == "mod1" and not config.mod1_is_connected) or \
+                    (node == "mod2" and not config.mod2_is_connected):
                 node_colors.append("red")
             else:
                 node_colors.append("green")
 
+        # kolory krawędzi zależnie od stanu
         edge_colors = []
-        for u, v in g.edges():
-            if (u == "server" and v == "motherboard" and not config.server_is_connected) or \
-                    (u == "website" and v == "server" and not config.website_is_connected) or \
-                    (u == "comp1" and v == "server" and not config.comp1_is_connected) or \
+        for u, v in edges:
+            if (u == "server" and not config.server_is_connected) or \
+                    (u == "website" and not config.website_is_connected) or \
+                    (u == "comp1" and not config.comp1_is_connected) or \
                     (u == "motherboard" and v == "mod1" and not config.mod1_is_connected) or \
                     (u == "motherboard" and v == "mod2" and not config.mod2_is_connected):
                 edge_colors.append("red")
@@ -73,6 +74,5 @@ def network_status():
             font_weight='bold'
         )
 
-    ani = FuncAnimation(fig, update, interval=500)
+    ani = FuncAnimation(fig, update, interval=500, cache_frame_data=False)
     plt.show()
-

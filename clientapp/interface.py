@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from customtkinter import *
 import threading
+
+from clientapp import getStatus
 import script
 import indexscript
 import getPosision
@@ -272,6 +274,7 @@ threading.Thread(target=send_loop, daemon=True).start()
 threading.Thread(target=receive_loop, daemon=True).start()
 #threading.Thread(target=set_led_mode, daemon=True).start()
 threading.Thread(target=periodic_check, daemon=True).start()
+threading.Thread(target=getStatus.network_checker, daemon=True).start()
 #threading.Thread(target=debug, daemon=True).start()
 if __name__ == '__main__':
     app.mainloop()
