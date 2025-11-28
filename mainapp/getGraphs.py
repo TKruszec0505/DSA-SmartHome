@@ -18,7 +18,7 @@ def graph():
 
     def init():
         ax.set_xlim(0, 50)  # zakres osi X (czas)
-        ax.set_ylim(-1, 1)  # zakres osi Y (wartości K) – dostosuj do swoich danych
+        ax.set_ylim(-1, 1)  # zakres osi Y (wartości K)
         return line,
 
     def update(frame):
@@ -59,7 +59,7 @@ def network_status():
         while True:
             ax.clear()
 
-            # tworzymy aktualna topologie
+
             network_topology_updated = network_topology.copy()
             if not config.serial_is_connected:
                 network_topology_updated = [edge for edge in network_topology_updated if
