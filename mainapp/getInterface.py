@@ -261,7 +261,7 @@ def update_switch_from_gniazdo2():
         gniazdo2_switch_var.set("off")
 
 
-image_path = r"C:\Users\Tomasz\PyCharmMiscProject\mainapp\qrcode1.png"
+image_path = "qrcode1.png"
 pil_image = Image.open(image_path)
 ctk_image = ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=(200, 200))
 image_label = ctk.CTkLabel(master=app, image=ctk_image, text="")
