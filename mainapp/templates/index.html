@@ -42,7 +42,8 @@
     <h1>Sterowanie urządzeniami</h1>
 
     <!-- Przełączniki -->
-    <button id="ledButton" onclick="toggleLed()">Ledy</button>
+    <button id="ledButton" onclick="toggleLed()">gniazdo(a1)</button>
+    <button id="gniazdoButton" onclick="toggleGniazdoa1()">gniazdo(a2)</button>
     <button id="lampButton" onclick="toggleLamp()">Lampa</button>
 
     <p id="response"></p>
@@ -52,8 +53,20 @@
 
         let ledState = false;
         let lampState = false;
+        let gniazdoState = false;
 
-        // Przełączanie LED
+        function toggleGniazdoa1(){
+            const endpoint = gniazdoState ? "/wylacz_ga1" : "/wlacz_ga1";
+            fetch(endpoint)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("response").innerText = data;
+                    receiveCommand(); // po kliknięciu od razu zsynchronizuj stan
+                })
+                .catch(error => console.error("Błąd:", error));
+        }
+
+        // Przełączanie LED(gniazda a1 jednak XD)
         function toggleLed() {
             const endpoint = ledState ? "/wylacz_led" : "/wlacz_led";
             fetch(endpoint)
@@ -85,24 +98,40 @@
                     // aktualizacja stanów
                     ledState = data.ledy === "włączone";
                     lampState = data.lampa === "włączona";
+                    gniazdoState = data.Ga1 === "włączona";
 
                     updateLedButton();
                     updateLampButton();
+                    updateGa1();
+
                 })
                 .catch(error => console.error("Błąd:", error));
         }
 
         // Aktualizacja wyglądu przycisków
+
+        function updateGa1(){
+            const btn = document.getElementById("gniazdoButton");
+            if (gniazdoState) {
+                btn.classList.add("on");
+                btn.classList.remove("off");
+                //btn.innerText = "Ledy (włączone)";
+            } else {
+                btn.classList.add("off");
+                btn.classList.remove("on");
+                //btn.innerText = "Ledy (wyłączone)";
+            }
+        }
         function updateLedButton() {
             const btn = document.getElementById("ledButton");
             if (ledState) {
                 btn.classList.add("on");
                 btn.classList.remove("off");
-                btn.innerText = "Ledy (włączone)";
+                //btn.innerText = "Ledy (włączone)";
             } else {
                 btn.classList.add("off");
                 btn.classList.remove("on");
-                btn.innerText = "Ledy (wyłączone)";
+               //btn.innerText = "Ledy (wyłączone)";
             }
         }
 
@@ -111,11 +140,11 @@
             if (lampState) {
                 btn.classList.add("on");
                 btn.classList.remove("off");
-                btn.innerText = "Lampa (włączona)";
+                //btn.innerText = "Lampa (włączona)";
             } else {
                 btn.classList.add("off");
                 btn.classList.remove("on");
-                btn.innerText = "Lampa (wyłączona)";
+                //btn.innerText = "Lampa (wyłączona)";
             }
         }
 

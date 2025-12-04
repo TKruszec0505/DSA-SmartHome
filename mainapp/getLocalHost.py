@@ -38,6 +38,15 @@ def run_host():
     def wylacz_led():
         config.ledy_mode = False
         return "ledy wyłączone"
+    @app.route('/wlacz_ga1')
+    def wlacz_ga1():
+        config.gniazdo2_mode = True
+        return "gniazdo wlaczone"
+    @app.route('/wylacz_ga1')
+    def wylacz_ga1():
+        config.gniazdo2_mode = False
+        return "gniazdo wylaczone"
+
     @app.route('/odsłoń')
     def odsłon():
         config.motor_up_state = True
@@ -63,6 +72,7 @@ def run_host():
         response = {
             "ledy": "włączone" if config.ledy_mode else "wyłączone",
             "lampa": "włączona" if config.lampa_mode else "wyłączona",
+            "Ga1": "włączona" if config.gniazdo2_mode else "wyłączona",
             "website": "połączony" if config.website_is_connected else "rozłączony"
 
         }
@@ -136,7 +146,7 @@ def run_host():
             "lampa_mode":                config.lampa_mode,
             "motor_up_state":            config.motor_up_state,
             "motor_down_state":          config.motor_down_state,
-            "gniazdo2_mode":                  config.gniazdo2_mode,
+            "gniazdo2_mode":             config.gniazdo2_mode,
 
             "serial_is_connected":       config.serial_is_connected,
             "comp1_is_connected":        config.comp1_is_connected,

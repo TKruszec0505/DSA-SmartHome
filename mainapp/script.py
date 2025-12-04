@@ -52,7 +52,8 @@ def lambda_for_commands(module,flag_name: str,state: bool, tekst_on: str, tekst_
         if not config.return_command_mode:
             setattr(module, flag_name, state)
         else:
-            if not flag_value:
+            # jesli config.cos to
+            if flag_value:
                 setattr(module, flag_name, state)
                 enginesay(tekst_on)
             else:
