@@ -3,11 +3,12 @@ import time
 import requests
 import config
 
-SERVER_URL = "http://192.168.100.7:5000"
+SERVER_URL = "http://192.168.100.15:5000"
 
 lock = threading.Lock()
 last_states_list = [config.ledy_mode,
                     config.lampa_mode,
+                    config.gniazdo2_mode,
                     config.motor_up_state,
                     config.motor_down_state,
 
@@ -19,13 +20,13 @@ last_states_list = [config.ledy_mode,
                     config.server_is_connected,
                     config.website_is_connected]
 
-
 def send_loop():
     global last_states_list
     while True:
         with lock:
             states_list = [config.ledy_mode,
                            config.lampa_mode,
+                           config.gniazdo2_mode,
                            config.motor_up_state,
                            config.motor_down_state,
 
@@ -43,6 +44,7 @@ def send_loop():
                     requests.post(f"{SERVER_URL}/set_states", json={
                         "ledy_mode": config.ledy_mode,
                         "lampa_mode": config.lampa_mode,
+                        "gniazdo2_mode": config.gniazdo2_mode,
                         "motor_up_state": config.motor_up_state,
                         "motor_down_state": config.motor_down_state,
 
@@ -72,6 +74,7 @@ def receive_loop():
             server_states_list = [
                 response["ledy_mode"],
                 response["lampa_mode"],
+                response["gniazdo2_mode"],
                 response["motor_up_state"],
                 response["motor_down_state"],
 
@@ -87,6 +90,7 @@ def receive_loop():
                 if server_states_list != last_states_list:
                     (config.ledy_mode,
                      config.lampa_mode,
+                     config.gniazdo2_mode,
                      config.motor_up_state,
                      config.motor_down_state,
 

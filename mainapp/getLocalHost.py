@@ -46,7 +46,6 @@ def run_host():
     def wylacz_ga1():
         config.gniazdo2_mode = False
         return "gniazdo wylaczone"
-
     @app.route('/odsłoń')
     def odsłon():
         config.motor_up_state = True
@@ -62,8 +61,6 @@ def run_host():
         config.motor_up_state = False
         config.motor_down_state = True
         return "zasłaniam"
-
-
     @app.route("/state")
     def state_manager():
         config.website_is_connected = True

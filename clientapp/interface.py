@@ -214,7 +214,7 @@ def gniazdo2_command():
     config.gniazdo2_mode = (gniazdo2_switch_var.get() == "on")
 
 gniazdo2_switch = ctk.CTkSwitch(master=frame,
-                                  text="voice e/d",
+                                  text="gniazdo 2",
                                   command=gniazdo2_command,
                                   variable=gniazdo2_switch_var,
                                   onvalue="on",
@@ -250,7 +250,7 @@ def update_gniazdo2():
         gniazdo2_switch_var.set("off")
 
 
-image_path = "qrcode1.png"
+image_path = "qrcode2.png"
 pil_image = Image.open(image_path)
 ctk_image = ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=(200, 200))
 image_label = ctk.CTkLabel(master=app, image=ctk_image, text="")
