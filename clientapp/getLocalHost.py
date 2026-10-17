@@ -3,7 +3,7 @@ import time
 import requests
 import config
 
-SERVER_URL = "http://192.168.100.15:5000"
+SERVER_URL = ""
 
 lock = threading.Lock()
 last_states_list = [config.ledy_mode,

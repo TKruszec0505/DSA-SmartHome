@@ -249,7 +249,6 @@ def update_gniazdo2():
     else:
         gniazdo2_switch_var.set("off")
 
-
 image_path = "qrcode2.png"
 pil_image = Image.open(image_path)
 ctk_image = ctk.CTkImage(light_image=pil_image, dark_image=pil_image, size=(200, 200))
