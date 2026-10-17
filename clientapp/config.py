@@ -16,3 +16,5 @@ return_command_mode = True
 
 motor_up_state = False
 motor_down_state = False
+
+cpu_temp = 0

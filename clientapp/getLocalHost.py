@@ -18,7 +18,9 @@ last_states_list = [config.ledy_mode,
                     config.mod2_is_connected,
                     config.motherboard_is_connected,
                     config.server_is_connected,
-                    config.website_is_connected]
+                    config.website_is_connected,
+
+                    config.cpu_temp]
 
 def send_loop():
     global last_states_list
@@ -48,7 +50,7 @@ def send_loop():
                         "motor_up_state": config.motor_up_state,
                         "motor_down_state": config.motor_down_state,
 
-                        #  "comp1_is_connected":           config.comp1_is_connected,
+                        # "comp1_is_connected":           config.comp1_is_connected,
                         # "mod1_is_connected":            config.mod1_is_connected,
                         # "mod2_is_connected":            config.mod2_is_connected,
                         # "motherboard_is_connected":     config.motherboard_is_connected,
@@ -84,6 +86,8 @@ def receive_loop():
                 response["website_is_connected"],
                 response["mod1_is_connected"],
                 response["mod2_is_connected"],
+
+                response["cpu_temp"]
             ]
 
             with lock:
@@ -99,7 +103,9 @@ def receive_loop():
                      config.mod2_is_connected,
                      config.motherboard_is_connected,
                      config.server_is_connected,
-                     config.website_is_connected) = server_states_list
+                     config.website_is_connected,
+
+                     config.cpu_temp) = server_states_list
 
                     last_states_list = server_states_list.copy()
 

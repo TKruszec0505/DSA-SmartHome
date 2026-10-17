@@ -268,6 +268,9 @@ def periodic_check():
         update_gniazdo2()
     app.after(500, periodic_check)
 
+def debug():
+    while True:
+        print(config.cpu_temp)
 
 periodic_check()
 threading.Thread(target=send_loop, daemon=True).start()
